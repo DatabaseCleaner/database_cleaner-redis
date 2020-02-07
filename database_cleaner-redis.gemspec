@@ -5,7 +5,7 @@ require "database_cleaner/redis/version"
 Gem::Specification.new do |spec|
   spec.name          = "database_cleaner-redis"
   spec.version       = DatabaseCleaner::Redis::VERSION
-  spec.authors       = ["Ernesto Tagwerker"]
+  spec.authors       = ["Ernesto Tagwerker", "Micah Geisel"]
   spec.email         = ["ernesto@ombulabs.com"]
 
   spec.summary       = "Strategies for cleaning databases using Redis. Can be used to ensure a clean state for testing."
