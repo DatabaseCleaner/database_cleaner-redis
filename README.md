@@ -56,4 +56,4 @@ end
 
 ## COPYRIGHT
 
-See [LICENSE] for details.
+See [LICENSE](LICENSE) for details.
