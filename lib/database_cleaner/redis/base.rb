@@ -3,11 +3,11 @@ require 'database_cleaner/generic/base'
 module DatabaseCleaner
   module Redis
     def self.available_strategies
-      %w{truncation}
+      %i[truncation]
     end
 
     def self.default_strategy
-      :truncation
+      available_strategies.first
     end
 
     module Base

@@ -4,7 +4,7 @@ require 'database_cleaner/spec'
 
 module DatabaseCleaner
   RSpec.describe Redis do
-    it { is_expected.to respond_to(:available_strategies) }
+    it_behaves_like "a database_cleaner adapter"
 
     it "has a default_strategy of truncation" do
       expect(described_class.default_strategy).to eq(:truncation)
@@ -17,11 +17,6 @@ module DatabaseCleaner
     end
 
     RSpec.describe ExampleStrategy do
-
-      it_should_behave_like "a generic strategy"
-      it { is_expected.to respond_to(:db) }
-      it { is_expected.to respond_to(:db=) }
-
       context "when passing url" do
         it "should store my describe db" do
           url = 'redis://localhost:6379/2'
