@@ -1,11 +1,26 @@
-require 'database_cleaner/redis/base'
-require 'database_cleaner/generic/truncation'
+require "database_cleaner/generic/base"
+require "database_cleaner/generic/truncation"
 
 module DatabaseCleaner
   module Redis
+    def self.available_strategies
+      %i[truncation]
+    end
+
+    def self.default_strategy
+      available_strategies.first
+    end
+
     class Truncation
-      include ::DatabaseCleaner::Redis::Base
-      include ::DatabaseCleaner::Generic::Truncation
+      include DatabaseCleaner::Generic::Base
+      include DatabaseCleaner::Generic::Truncation
+
+      def db
+        @db ||= :default
+      end
+      attr_writer :db
+
+      alias_method :url, :db
 
       def clean
         if @only
@@ -20,6 +35,20 @@ module DatabaseCleaner
           connection.flushdb
         end
         connection.quit unless url == :default
+      end
+
+      private
+
+      def connection
+        @connection ||= begin
+          if url == :default
+            ::Redis.new
+          elsif db.is_a?(::Redis) # pass directly the connection
+            db
+          else
+            ::Redis.new(url: url)
+          end
+        end
       end
     end
   end
