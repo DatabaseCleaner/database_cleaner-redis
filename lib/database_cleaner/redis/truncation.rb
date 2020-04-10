@@ -1,52 +1,42 @@
-require "database_cleaner/generic/base"
-require "database_cleaner/generic/truncation"
+require "database_cleaner/strategy"
 
 module DatabaseCleaner
   module Redis
-    def self.available_strategies
-      %i[truncation]
-    end
-
-    def self.default_strategy
-      available_strategies.first
-    end
-
-    class Truncation
-      include DatabaseCleaner::Generic::Base
-      include DatabaseCleaner::Generic::Truncation
-
-      def db
-        @db ||= :default
+    class Truncation < Strategy
+      def initialize only: [], except: []
+        @only = only
+        @except = except
       end
-      attr_writer :db
-
-      alias_method :url, :db
 
       def clean
-        if @only
-          @only.each do |term|
-            connection.keys(term).each { |k| connection.del k }
-          end
-        elsif @tables_to_exclude
-          keys_except = []
-          @tables_to_exclude.each { |term| keys_except += connection.keys(term) }
-          connection.keys.each { |k| connection.del(k) unless keys_except.include?(k) }
-        else
+        only = expand_keys(@only)
+        except = expand_keys(@except)
+
+        if only.none? && except.none?
           connection.flushdb
+        else
+          tables_to_clean(connection.keys, only: only, except: except).each do |key|
+            connection.del key
+          end
         end
-        connection.quit unless url == :default
+
+        connection.quit unless db == :default
       end
 
       private
 
+      def expand_keys keys
+        keys.flat_map { |key| connection.keys(key) }
+      end
+
       def connection
         @connection ||= begin
-          if url == :default
+          if db == :default
             ::Redis.new
           elsif db.is_a?(::Redis) # pass directly the connection
             db
           else
-            ::Redis.new(url: url)
+            ::Redis.new(url: db)
           end
         end
       end
