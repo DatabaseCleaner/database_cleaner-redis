@@ -23,21 +23,43 @@ RSpec.describe DatabaseCleaner::Redis::Truncation do
     end
   end
 
-  context "when keys are provided to the :only option" do
-    subject { described_class.new(only: ['Widge*']) }
+  context "with the :only option" do
+    context "with concrete keys" do
+      subject { described_class.new(only: ['Widget']) }
 
-    it "only truncates the specified keys" do
-      expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
-      expect(@redis.get('Gadget')).to eq '1'
+      it "only truncates the specified keys" do
+        expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
+        expect(@redis.get('Gadget')).to eq '1'
+      end
+    end
+
+    context "with wildcard keys" do
+      subject { described_class.new(only: ['Widge*']) }
+
+      it "only truncates the specified keys" do
+        expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
+        expect(@redis.get('Gadget')).to eq '1'
+      end
     end
   end
 
-  context "when keys are provided to the :except option" do
-    subject { described_class.new(except: ['Widg*']) }
+  context "with the :except option" do
+    context "with concrete keys" do
+      subject { described_class.new(except: ['Widget']) }
 
-    it "truncates all but the specified keys" do
-      expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
-      expect(@redis.get('Widget')).to eq '1'
+      it "truncates all but the specified keys" do
+        expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
+        expect(@redis.get('Widget')).to eq '1'
+      end
+    end
+
+    context "with wildcard keys" do
+      subject { described_class.new(except: ['Widg*']) }
+
+      it "truncates all but the specified keys" do
+        expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
+        expect(@redis.get('Widget')).to eq '1'
+      end
     end
   end
 
