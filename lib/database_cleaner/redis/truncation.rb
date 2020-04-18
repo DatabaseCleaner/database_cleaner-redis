@@ -15,7 +15,8 @@ module DatabaseCleaner
         if only.none? && except.none?
           connection.flushdb
         else
-          tables_to_clean(connection.keys, only: only, except: except).each do |key|
+          only = connection.keys if only.none?
+          (only - except).each do |key|
             connection.del key
           end
         end
