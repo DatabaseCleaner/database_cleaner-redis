@@ -64,18 +64,20 @@ RSpec.describe DatabaseCleaner::Redis::Truncation do
   end
 
   context "when passing url" do
-    it "should store my describe db" do
-      url = 'redis://localhost:6379/2'
-      subject.db = 'redis://localhost:6379/2'
+    it "still works" do
+      url = @redis.connection[:id]
+      subject.db = url
       expect(subject.db).to eq url
+      expect { subject.clean }.to change { @redis.keys.size }.from(2).to(0)
     end
   end
 
   context "when passing connection" do
-    it "should store my describe db" do
-      connection = ::Redis.new :url => 'redis://localhost:6379/2'
+    it "still works" do
+      connection = Redis.new(url: @redis.connection[:id])
       subject.db = connection
       expect(subject.db).to eq connection
+      expect { subject.clean }.to change { @redis.keys.size }.from(2).to(0)
     end
   end
 
