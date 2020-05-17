@@ -19,41 +19,26 @@ end
 
 ## Supported Strategies
 
-<table>
-  <tbody>
-    <tr>
-      <th>Truncation</th>
-      <th>Transaction</th>
-      <th>Deletion</th>
-    </tr>
-    <tr>
-      <td> <b>Yes</b></td>
-      <td> No</td>
-      <td> No</td>
-    </tr>
-  </tbody>
-</table>
+The redis adapter only has one strategy: the deletion strategy.
 
-(Default strategy is denoted in bold)
+## Strategy configuration options
 
-## Configuration options
+`:only` and `:except` may take a list of strings to be passed to [`keys`](https://redis.io/commands/keys)).
 
-`:only` and `:except` take a list of strings to be passed to [`keys`](https://redis.io/commands/keys)).
+## Adapter configuration options
 
-<table>
-  <tbody>
-    <tr>
-      <th>ORM</th>
-      <th>How to access</th>
-      <th>Notes</th>
-    </tr>
-    <tr>
-      <td>Redis</td>
-      <td><code>DatabaseCleaner[:redis]</code></td>
-      <td>Connection specified as Redis URI</td>
-    </tr>
-  </tbody>
-</table>
+`#db` defaults to `Redis.new`, but can be specified manually in a few ways:
+
+```ruby
+# Redis URI string:
+DatabaseCleaner[:redis].db = "redis://localhost:6379/0"
+
+# Redis connection object:
+DatabaseCleaner[:redis].db = Redis.new(url: "redis://localhost:6379/0")
+
+# Back to default:
+DatabaseCleaner[:redis].db = :default
+```
 
 ## COPYRIGHT
 
