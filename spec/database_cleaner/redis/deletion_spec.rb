@@ -1,8 +1,8 @@
 require 'redis'
-require 'database_cleaner/redis/truncation'
+require 'database_cleaner/redis/deletion'
 require 'yaml'
 
-RSpec.describe DatabaseCleaner::Redis::Truncation do
+RSpec.describe DatabaseCleaner::Redis::Deletion do
   around do |example|
     config = YAML::load(File.open("spec/support/redis.yml"))
     @redis = ::Redis.new :url => config['test']['url']
@@ -18,7 +18,7 @@ RSpec.describe DatabaseCleaner::Redis::Truncation do
   end
 
   context "by default" do
-    it "truncates all keys" do
+    it "deletes all keys" do
       expect { subject.clean }.to change { @redis.keys.size }.from(2).to(0)
     end
   end
@@ -27,7 +27,7 @@ RSpec.describe DatabaseCleaner::Redis::Truncation do
     context "with concrete keys" do
       subject { described_class.new(only: ['Widget']) }
 
-      it "only truncates the specified keys" do
+      it "only deletes the specified keys" do
         expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
         expect(@redis.get('Gadget')).to eq '1'
       end
@@ -36,7 +36,7 @@ RSpec.describe DatabaseCleaner::Redis::Truncation do
     context "with wildcard keys" do
       subject { described_class.new(only: ['Widge*']) }
 
-      it "only truncates the specified keys" do
+      it "only deletes the specified keys" do
         expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
         expect(@redis.get('Gadget')).to eq '1'
       end
@@ -47,7 +47,7 @@ RSpec.describe DatabaseCleaner::Redis::Truncation do
     context "with concrete keys" do
       subject { described_class.new(except: ['Widget']) }
 
-      it "truncates all but the specified keys" do
+      it "deletes all but the specified keys" do
         expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
         expect(@redis.get('Widget')).to eq '1'
       end
@@ -56,7 +56,7 @@ RSpec.describe DatabaseCleaner::Redis::Truncation do
     context "with wildcard keys" do
       subject { described_class.new(except: ['Widg*']) }
 
-      it "truncates all but the specified keys" do
+      it "deletes all but the specified keys" do
         expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
         expect(@redis.get('Widget')).to eq '1'
       end

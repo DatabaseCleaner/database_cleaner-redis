@@ -2,7 +2,7 @@ require "database_cleaner/strategy"
 
 module DatabaseCleaner
   module Redis
-    class Truncation < Strategy
+    class Deletion < Strategy
       def initialize only: [], except: []
         @only = only
         @except = except

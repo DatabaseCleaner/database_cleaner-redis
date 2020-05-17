@@ -1,5 +1,5 @@
 require "database_cleaner/redis/version"
 require "database_cleaner/core"
-require "database_cleaner/redis/truncation"
+require "database_cleaner/redis/deletion"
 
-DatabaseCleaner[:redis].strategy = :truncation
+DatabaseCleaner[:redis].strategy = :deletion
