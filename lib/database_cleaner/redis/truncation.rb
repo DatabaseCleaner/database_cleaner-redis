@@ -9,14 +9,10 @@ module DatabaseCleaner
       end
 
       def clean
-        only = expand_keys(@only)
-        except = expand_keys(@except)
-
-        if only.none? && except.none?
+        if @only.none? && @except.none?
           connection.flushdb
         else
-          only = connection.keys if only.none?
-          (only - except).each do |key|
+          keys_to_delete.each do |key|
             connection.del key
           end
         end
@@ -25,6 +21,13 @@ module DatabaseCleaner
       end
 
       private
+
+      def keys_to_delete
+        only = expand_keys(@only)
+        except = expand_keys(@except)
+        only = connection.keys if only.none?
+        (only - except)
+      end
 
       def expand_keys keys
         keys.flat_map { |key| connection.keys(key) }
