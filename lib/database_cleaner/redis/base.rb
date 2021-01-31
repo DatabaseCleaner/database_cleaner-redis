@@ -1,9 +1,10 @@
 require 'database_cleaner/generic/base'
+require 'database_cleaner/deprecation'
 
 module DatabaseCleaner
   module Redis
     def self.available_strategies
-      %w{truncation}
+      %w{truncation deletion}
     end
 
     def self.default_strategy
@@ -21,7 +22,10 @@ module DatabaseCleaner
         @db ||= :default
       end
 
-      alias url db
+      def url
+        DatabaseCleaner.deprecate "The redis deletion strategy's #url method is deprecated. It will be removed in database_cleaner-redis 2.0 in favor of #db."
+        db
+      end
 
       private
 
@@ -32,7 +36,7 @@ module DatabaseCleaner
           elsif db.is_a?(::Redis) # pass directly the connection
             db
           else
-            ::Redis.new(:url => url)
+            ::Redis.new(:url => db)
           end
         end
       end
