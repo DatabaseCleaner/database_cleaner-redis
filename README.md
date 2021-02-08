@@ -27,10 +27,10 @@ The redis adapter only has one strategy: the deletion strategy.
 
 ```ruby
 # Only delete the "users" key, and keys that start with "cache".
-DatabaseCleaner[:redis].strategy = :deletion, { only: ["users", "cache*"] }
+DatabaseCleaner[:redis].strategy = :deletion, only: ["users", "cache*"]
 
 # Delete all keys except the "users" key.
-DatabaseCleaner[:redis].strategy = :deletion, { except: ["users"] }
+DatabaseCleaner[:redis].strategy = :deletion, except: ["users"]
 ```
 
 ## Adapter configuration options
