@@ -41,6 +41,15 @@ RSpec.describe DatabaseCleaner::Redis::Deletion do
         expect(@redis.get('Gadget')).to eq '1'
       end
     end
+
+    context "with wildcard keys and no matches in Redis DB" do
+      subject { described_class.new(only: ["test*"]) }
+
+      it "only deletes the specified keys" do
+        subject.clean
+        expect(@redis.keys).to match_array(["Widget", "Gadget"])
+      end
+    end
   end
 
   context "with the :except option" do
