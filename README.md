@@ -23,7 +23,7 @@ The redis adapter only has one strategy: the deletion strategy.
 
 ## Strategy configuration options
 
-`:only` and `:except` may take a list of strings to be passed to [`keys`](https://redis.io/commands/keys)):
+`:only` and `:except` may take a list of strings to be passed to [`keys`](https://redis.io/commands/keys):
 
 ```ruby
 # Only delete the "users" key, and keys that start with "cache".
