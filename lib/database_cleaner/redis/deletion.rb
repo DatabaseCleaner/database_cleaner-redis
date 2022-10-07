@@ -3,13 +3,13 @@ require "database_cleaner/strategy"
 module DatabaseCleaner
   module Redis
     class Deletion < Strategy
-      def initialize only: [], except: []
+      def initialize only: nil, except: nil
         @only = only
         @except = except
       end
 
       def clean
-        if @only.none? && @except.none?
+        if @only.nil? && @except.nil?
           connection.flushdb
         else
           keys_to_delete.each do |key|
@@ -23,9 +23,8 @@ module DatabaseCleaner
       private
 
       def keys_to_delete
-        only = expand_keys(@only)
-        except = expand_keys(@except)
-        only = connection.keys if only.none?
+        only = @only.nil? ? connection.keys : expand_keys(@only)
+        except = @except.nil? ? [] : expand_keys(@except)
         (only - except)
       end
 

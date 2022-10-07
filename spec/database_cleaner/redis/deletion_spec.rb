@@ -31,6 +31,15 @@ RSpec.describe DatabaseCleaner::Redis::Deletion do
         expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
         expect(@redis.get('Gadget')).to eq '1'
       end
+
+      context "but nothing matches in the database" do
+        subject { described_class.new(only: ['Foo']) }
+
+        it "does not delete the database" do
+          expect { subject.clean }.not_to change { @redis.keys.size }
+          expect(@redis.keys).to match_array(["Widget", "Gadget"])
+        end
+      end
     end
 
     context "with wildcard keys" do
@@ -39,6 +48,15 @@ RSpec.describe DatabaseCleaner::Redis::Deletion do
       it "only deletes the specified keys" do
         expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
         expect(@redis.get('Gadget')).to eq '1'
+      end
+
+      context "but nothing matches in the database" do
+        subject { described_class.new(only: ['Foo*']) }
+
+        it "does not delete the database" do
+          expect { subject.clean }.not_to change { @redis.keys.size }
+          expect(@redis.keys).to match_array(["Widget", "Gadget"])
+        end
       end
     end
   end
@@ -59,6 +77,44 @@ RSpec.describe DatabaseCleaner::Redis::Deletion do
       it "deletes all but the specified keys" do
         expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
         expect(@redis.get('Widget')).to eq '1'
+      end
+    end
+  end
+
+  context "with the :only and :except options" do
+    context "with concrete keys" do
+      subject { described_class.new(only: ['Widget', 'Gadget'], except: ['Gadget']) }
+
+      it "only deletes the difference between the specified keys" do
+        expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
+        expect(@redis.get('Gadget')).to eq '1'
+      end
+
+      context "but :only does not match anything in the database" do
+        subject { described_class.new(only: ['Foo', 'Bar'], except: ['Gadget']) }
+
+        it "does not delete anything in the database" do
+          expect { subject.clean }.not_to change { @redis.keys.size }
+          expect(@redis.keys).to match_array(["Widget", "Gadget"])
+        end
+      end
+    end
+
+    context "with wildcard keys" do
+      subject { described_class.new(only: ['Widge*', 'Gadge*'], except: ['Ga*']) }
+
+      it "only deletes the difference between the specified keys" do
+        expect { subject.clean }.to change { @redis.keys.size }.from(2).to(1)
+        expect(@redis.get('Gadget')).to eq '1'
+      end
+
+      context "but :only does not match anything in the database" do
+        subject { described_class.new(only: ['F*', 'B*'], except: ['Ga*']) }
+
+        it "does not delete the database" do
+          expect { subject.clean }.not_to change { @redis.keys.size }
+          expect(@redis.keys).to match_array(["Widget", "Gadget"])
+        end
       end
     end
   end
